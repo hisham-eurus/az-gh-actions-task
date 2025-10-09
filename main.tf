@@ -1,5 +1,16 @@
-# We strongly recommend using the required_providers block to set the
-# Azure Provider source and version being used
+# Variables
+
+variable "storage_acc_name" {
+  type        = string
+  description = "The unique name of the storage account"
+}
+
+variable "subscription_id" {
+    type = string
+    sensitive = true
+    description = "Subscription ID for Terraform to Authenticate with Azure"
+}
+
 terraform {
   required_providers {
     azurerm = {
@@ -11,18 +22,11 @@ terraform {
 
 # Configure the Microsoft Azure Provider
 provider "azurerm" {
-
+  subscription_id = var.subscription_id
   features {}
   # In version 4 of azurerm, subscription id is mandatory.
   # export ARM_SUBSCRIPTION_ID=00000000-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
-}
-
-# Variables
-
-variable "storage_acc_name" {
-  type        = string
-  description = "The unique name of the storage account"
 }
 
 # Create a resource group
