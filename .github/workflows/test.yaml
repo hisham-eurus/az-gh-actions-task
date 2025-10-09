@@ -9,26 +9,26 @@ permissions:
 jobs:
     test:
         runs-on: ubuntu-latest
-        env:
-            STORAGE_ACCOUNT: ${{ vars.STORAGE_ACCOUNT }}
         steps:
-        - name: Azure CLI Login
-          uses: azure/login@v2
-          with:
-            client-id: ${{ secrets.AZURE_CLIENT_ID }}
-            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          - uses: hashicorp/setup-terraform@v3
+
+          - name: Azure CLI Login
+            uses: azure/login@v2
+            with:
+              client-id: ${{ secrets.AZURE_CLIENT_ID }}
+              tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+              subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     
-        - name: Azure CLI script, list resources
-          uses: azure/cli@v2
-          with:
-            azcliversion: latest
-            inlineScript: |
-                az account show;
-                az resource list --resource-group hisham-rg
+          - name: Azure CLI script, list resources
+            uses: azure/cli@v2
+            with:
+              azcliversion: latest
+              inlineScript: |
+                  az account show;
+                  az resource list --resource-group hisham-rg
             # You can write your Azure CLI inline scripts here.
-        - name: Terraform Apply
-          run: |
-            terraform init
-            terraform apply -auto-approve \
-            -var "storage_account_name=${{ vars.STORAGE_ACCOUNT_NAME }}" \        
+          - name: Terraform Init
+            run: terraform init
+          
+          - name: Terraform Apply
+            run: terraform apply -auto-approve -var "storage_account_name=${{ vars.STORAGE_ACCOUNT }}" 
