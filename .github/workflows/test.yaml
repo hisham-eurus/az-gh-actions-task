@@ -4,22 +4,34 @@ on: [push]
 permissions:
   id-token: write # Require write permission to Fetch an OIDC token.
   contents: read
-jobs: 
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Azure CLI Login
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  
-    - name: Azure CLI script
-      uses: azure/cli@v2
-      with:
-        azcliversion: latest
-        inlineScript: |
-          az account show;
-          az group show --resource-group hisham-rg
-          # You can write your Azure CLI inline scripts here.
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        env:
+            STORAGE_ACCOUNT: ${{ vars.STORAGE_ACCOUNT_NAME }}
+            CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
+        steps:
+        - name: Azure CLI Login
+          uses: azure/login@v2
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    
+        - name: Azure CLI script, list resources
+          uses: azure/cli@v2
+          with:
+            azcliversion: latest
+            inlineScript: |
+                az account show;
+                az resource list --resource-group hisham-rg
+            # You can write your Azure CLI inline scripts here.
+        
+        - name: Ensure Storage Container exists
+          uses: azure/cli@v2
+          with:
+            inlineScript: |
+                az storage container create \
+                --account-name $STORAGE_ACCOUNT \
+                --name $CONTAINER_NAME \
+                --auth-mode login
