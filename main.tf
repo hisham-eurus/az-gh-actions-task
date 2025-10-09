@@ -40,9 +40,3 @@ resource "azurerm_storage_account" "terraform_storage_acc" {
 
 }
 
-# resource "azurerm_storage_container" "data_container" {
-#   name                  = "data"
-#   storage_account_id    = azurerm_storage_account.terraform_storage_acc.id
-#   container_access_type = "blob"
-#   depends_on            = [azurerm_storage_account.terraform_storage_acc]
-# }
