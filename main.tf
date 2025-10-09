@@ -20,11 +20,10 @@ provider "azurerm" {
 
 # Variables
 
-variable "storage_acc_name" {
-  type        = string
-  description = "The unique name of the storage account"
-}
-
+# variable "storage_acc_name" {
+#   type        = string
+#   description = "The unique name of the storage account"
+# }
 
 # Create a resource group
 resource "azurerm_resource_group" "hisham_rg" {
@@ -33,7 +32,7 @@ resource "azurerm_resource_group" "hisham_rg" {
 }
 
 resource "azurerm_storage_account" "terraform_storage_acc" {
-  name                     = var.storage_acc_name
+  name                     = "ghactionsstorageacc1234"
   resource_group_name      = azurerm_resource_group.hisham_rg.name
   location                 = azurerm_resource_group.hisham_rg.location
   account_tier             = "Standard"
