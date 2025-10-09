@@ -30,12 +30,9 @@ jobs:
             # You can write your Azure CLI inline scripts here.
           - name: Terraform Init
             run: terraform init
-            
-          - name: Terraform Plan
-            run: terraform plan 
-              -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
-              -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
               
+          - name: Terraform Import
+            run: terraform import "/subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/hisham-rg"
           - name: Terraform Apply
             run: terraform apply -auto-approve 
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
