@@ -8,7 +8,7 @@ jobs:
     test:
         runs-on: ubuntu-latest
         env:
-            STORAGE_ACCOUNT: ${{ vars.STORAGE_ACCOUNT_NAME }}
+            STORAGE_ACCOUNT: ${{ vars.STORAGE_ACCOUNT }}
             CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
         steps:
         - name: Azure CLI Login
