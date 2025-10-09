@@ -1,6 +1,8 @@
 name: Run Azure CLI Login with OpenID Connect
 on: [push, workflow_dispatch]
-     
+
+# https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect
+
 permissions:
   id-token: write # Require write permission to Fetch an OIDC token.
   contents: read
@@ -9,7 +11,6 @@ jobs:
         runs-on: ubuntu-latest
         env:
             STORAGE_ACCOUNT: ${{ vars.STORAGE_ACCOUNT }}
-            CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
         steps:
         - name: Azure CLI Login
           uses: azure/login@v2
@@ -26,12 +27,8 @@ jobs:
                 az account show;
                 az resource list --resource-group hisham-rg
             # You can write your Azure CLI inline scripts here.
-        
-        - name: Ensure Storage Container exists
-          uses: azure/cli@v2
-          with:
-            inlineScript: |
-                az storage container create \
-                --account-name $STORAGE_ACCOUNT \
-                --name $CONTAINER_NAME \
-                --auth-mode login
+        - name: Terraform Apply
+          run: |
+            terraform init
+            terraform apply -auto-approve \
+            -var "storage_account_name=${{ vars.STORAGE_ACCOUNT_NAME }}" \        

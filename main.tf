@@ -20,10 +20,10 @@ provider "azurerm" {
 
 # Variables
 
-# variable "storage_acc_name" {
-#   type        = string
-#   description = "The unique name of the storage account"
-# }
+variable "storage_acc_name" {
+  type        = string
+  description = "The unique name of the storage account"
+}
 
 # Create a resource group
 resource "azurerm_resource_group" "hisham_rg" {
@@ -32,20 +32,17 @@ resource "azurerm_resource_group" "hisham_rg" {
 }
 
 resource "azurerm_storage_account" "terraform_storage_acc" {
-  name                     = "ghactionsstorageacc1234"
+  name                     = var.storage_acc_name
   resource_group_name      = azurerm_resource_group.hisham_rg.name
   location                 = azurerm_resource_group.hisham_rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
-  tags = {
-    environment = "staging"
-  }
 }
 
-resource "azurerm_storage_container" "data_container" {
-  name                  = "data"
-  storage_account_id    = azurerm_storage_account.terraform_storage_acc.id
-  container_access_type = "blob"
-  depends_on            = [azurerm_storage_account.terraform_storage_acc]
-}
+# resource "azurerm_storage_container" "data_container" {
+#   name                  = "data"
+#   storage_account_id    = azurerm_storage_account.terraform_storage_acc.id
+#   container_access_type = "blob"
+#   depends_on            = [azurerm_storage_account.terraform_storage_acc]
+# }
