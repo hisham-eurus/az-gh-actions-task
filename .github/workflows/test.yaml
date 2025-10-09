@@ -32,7 +32,7 @@ jobs:
             run: terraform init
               
           - name: Terraform Import
-            run: terraform import "/subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/hisham-rg"
+            run: terraform import azurerm_resource_group.hisham_rg "/subscriptions/${{secrets.AZURE_SUBSCRIPTION_ID}}/resourceGroups/hisham-rg"
 
           - name: Terraform Apply - Create Storage Acc
             run: terraform apply -auto-approve 
