@@ -33,6 +33,6 @@ jobs:
           
           - name: Terraform Apply
             run: terraform apply -auto-approve \
-              -var "storage_account_name=${{ vars.STORAGE_ACCOUNT }}" \
+              -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" \
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
