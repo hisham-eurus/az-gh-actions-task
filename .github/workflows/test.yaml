@@ -10,8 +10,6 @@ jobs:
     test:
         runs-on: ubuntu-latest
         steps:
-          - name: "Checkout Code"
-            uses: actions/checkout@v4
           - name: Azure CLI Login
             uses: azure/login@v2
             with:
@@ -26,7 +24,8 @@ jobs:
               inlineScript: |
                 az account show; az resource list --resource-group hisham-rg
               # You can write your Azure CLI inline scripts here.
-
+          - name: "Checkout Code"
+            uses: actions/checkout@v4
           - name: "Setup Terraform"
             uses: hashicorp/setup-terraform@v3
 
