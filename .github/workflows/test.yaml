@@ -10,24 +10,26 @@ jobs:
     test:
         runs-on: ubuntu-latest
         steps:
-          - uses: actions/checkout@v4
-          - uses: hashicorp/setup-terraform@v3
-
+          - name: "Checkout Code"
+            uses: actions/checkout@v4
           - name: Azure CLI Login
             uses: azure/login@v2
             with:
               client-id: ${{ secrets.AZURE_CLIENT_ID }}
               tenant-id: ${{ secrets.AZURE_TENANT_ID }}
               subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    
+              
           - name: Azure CLI script, list resources
             uses: azure/cli@v2
             with:
               azcliversion: latest
               inlineScript: |
-                  az account show;
-                  az resource list --resource-group hisham-rg
-            # You can write your Azure CLI inline scripts here.
+                az account show; az resource list --resource-group hisham-rg
+              # You can write your Azure CLI inline scripts here.
+
+          - name: "Setup Terraform"
+            uses: hashicorp/setup-terraform@v3
+
           - name: Terraform Init
             run: terraform init
               
