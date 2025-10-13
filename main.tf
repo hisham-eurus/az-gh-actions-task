@@ -6,24 +6,31 @@ variable "storage_acc_name" {
 }
 
 variable "subscription_id" {
-    type = string
-    sensitive = true
-    description = "Subscription ID for Terraform to Authenticate with Azure"
+  type        = string
+  sensitive   = true
+  description = "Subscription ID for Terraform to Authenticate with Azure"
 }
 
 variable "client_id" {
-    type = string
-    sensitive = true
-    description = "Client ID for Terraform to Authenticate with Azure"
+  type        = string
+  sensitive   = true
+  description = "Client ID for Terraform to Authenticate with Azure"
 }
 
 variable "tenant_id" {
-    type = string
-    sensitive = true
-    description = "Tenant ID for Terraform to Authenticate with Azure"
+  type        = string
+  sensitive   = true
+  description = "Tenant ID for Terraform to Authenticate with Azure"
 }
 
 terraform {
+  backend "azurerm" {
+    resource_group_name  = "hisham-rg"
+    storage_account_name = "tfstatestorage131025"
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+    use_azuread_auth     = true
+  }
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -37,9 +44,9 @@ provider "azurerm" {
   features {}
   # In version 4 of azurerm, subscription id is mandatory.
   # export ARM_SUBSCRIPTION_ID=00000000-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-  use_oidc = true
-  client_id = var.client_id
-  tenant_id = var.tenant_id
+  use_oidc        = true
+  client_id       = var.client_id
+  tenant_id       = var.tenant_id
   subscription_id = var.subscription_id
 
 }
