@@ -32,8 +32,26 @@ jobs:
           - name: Terraform Init
             run: terraform init
 
-          - name: Terraform Plan
-            run: terraform plan
+          - name: Check if Storage Account already Exists
+            id: check
+            uses: azure/cli@v2
+            with:
+              inlineScript: |
+                echo "Checking if Storage Account $STORAGE_ACC_NAME exists"
+                if az storage account show -n $STORAGE_ACC_NAME -g $RESOURCE_GROUP >/dev/null 2>&1; then
+                  echo "exists=true" >> $GITHUB_OUTPUT
+                else
+                  echo "exists=false" >> $GITHUB_OUTPUT
+                fi
+            
+          - name: Import Existing Storage Account into Terraform State
+            if: steps.check.outputs.exists == 'true'
+            run: |
+              echo "Importing storage account into Terraform state"
+              terraform import azurerm_storage_account.githubactionsstorage /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACC_NAME
+
+          - name: Terraform Plan - Destroy
+            run: terraform plan -destroy
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
               -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
