@@ -7,6 +7,10 @@ on:
                 description: "Only plan the Terraform Apply step (true/false)"
                 required: false
                 default: "false"
+            trigger_destroy:
+                description: "Trigger destroy workflow after creation (true/false)"
+                required: false
+                default: "false"
 
 
 permissions:
@@ -77,3 +81,11 @@ jobs:
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
               -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
               -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
+
+          - name: Trigger Destroy Workflow 
+            if: ${{ github.event.inputs.trigger_destroy == 'true' }}
+            env:
+              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            run: |
+              echo "Triggering Destroy Workflow..."
+              gh workflow run "Destroy Azure Storage Account with Terraform" --ref main
