@@ -1,0 +1,38 @@
+name: Destroy Azure Storage Account with Terraform
+on:
+    workflow_dispatch: 
+    workflow_run:
+      workflows: ["Create Azure Storage Account with Terraform"]
+      types: completed
+
+permissions:
+  id-token: write # Require write permission to Fetch an OIDC token.
+  contents: read
+jobs:
+    call-login:
+      uses: ./.github/workflows/azure-login.yaml
+      secrets:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
+    destroy-storage:
+      needs: call-login
+      runs-on: ubuntu-latest
+      steps:
+          - name: "Wait before Destroying"
+            run: sleep 240
+    
+          - name: "Checkout Code"
+            uses: actions/checkout@v4
+
+          - name: "Setup Terraform"
+            uses: hashicorp/setup-terraform@v3
+
+          - name: Terraform Init
+            run: terraform init
+            
+          - name: Terraform Destroy Storage Account
+            run: terraform destroy -auto-approve 
+              -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
+              -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
