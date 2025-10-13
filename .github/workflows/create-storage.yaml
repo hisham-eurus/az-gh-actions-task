@@ -5,15 +5,15 @@ permissions:
   id-token: write # Require write permission to Fetch an OIDC token.
   contents: read
 jobs:
-    # call-login:
-    #   uses: ./.github/workflows/azure-login.yaml
-    #   secrets:
-    #     AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-    #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    #     AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+    call-login:
+      uses: ./.github/workflows/azure-login.yaml
+      secrets:
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
     create-storage:
-      # needs: call-login
+      needs: call-login
       runs-on: ubuntu-latest
       env:
         ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -23,19 +23,19 @@ jobs:
         RESOURCE_GROUP: hisham-rg
 
       steps:
-          - name: Azure CLI Login
-            uses: azure/login@v2
-            with:
-              client-id: ${{ secrets.AZURE_CLIENT_ID }}
-              tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-              subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          # - name: Azure CLI Login
+          #   uses: azure/login@v2
+          #   with:
+          #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           
-          - name: Verify Login, List Resources
-            uses: azure/cli@v2
-            with:
-              inlineScript: |
-                az account show;
-                az resource list --resource-group $RESOURCE_GROUP --output table
+          # - name: Verify Login, List Resources
+          #   uses: azure/cli@v2
+          #   with:
+          #     inlineScript: |
+          #       az account show;
+          #       az resource list --resource-group $RESOURCE_GROUP --output table
 
           - name: "Checkout Code"
             uses: actions/checkout@v4
@@ -46,27 +46,27 @@ jobs:
           - name: Terraform Init
             run: terraform init
 
-          - name: Check if Storage Account already Exists
-            id: check
-            run: |
-              echo "Checking if Storage Account $STORAGE_ACC_NAME exists"
-              if az storage account show -n $STORAGE_ACC_NAME -g $RESOURCE_GROUP >/dev/null 2>&1; then
-                echo "storage account already exists"
-                echo "STORAGE_EXISTS=true" >> $GITHUB_ENV
-              else
-                echo "storage account doesn't exist"
-                echo "STORAGE_EXISTS=false" >> $GITHUB_ENV
-              fi
+          # - name: Check if Storage Account already Exists
+          #   id: check
+          #   run: |
+          #     echo "Checking if Storage Account $STORAGE_ACC_NAME exists"
+          #     if az storage account show -n $STORAGE_ACC_NAME -g $RESOURCE_GROUP >/dev/null 2>&1; then
+          #       echo "storage account already exists"
+          #       echo "STORAGE_EXISTS=true" >> $GITHUB_ENV
+          #     else
+          #       echo "storage account doesn't exist"
+          #       echo "STORAGE_EXISTS=false" >> $GITHUB_ENV
+          #     fi
             
-          - name: Import Existing Storage Account into Terraform State
-            if: env.STORAGE_EXISTS == 'true'
-            run: |
-              echo "Importing storage account into Terraform state"
-              terraform import azurerm_storage_account.terraform_storage_acc /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACC_NAME \
-              -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" \
-              -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-              -var "client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-              -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
+          # - name: Import Existing Storage Account into Terraform State
+          #   if: env.STORAGE_EXISTS == 'true'
+          #   run: |
+          #     echo "Importing storage account into Terraform state"
+          #     terraform import azurerm_storage_account.terraform_storage_acc /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACC_NAME \
+          #     -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" \
+          #     -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+          #     -var "client_id=${{ secrets.AZURE_CLIENT_ID }}" \
+          #     -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
 
           - name: Terraform Apply - Create Storage Acc
             run: terraform apply -auto-approve 
