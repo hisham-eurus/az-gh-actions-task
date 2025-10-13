@@ -19,6 +19,13 @@ jobs:
     destroy-storage:
       needs: call-login
       runs-on: ubuntu-latest
+      env:
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        STORAGE_ACC_NAME: ${{ vars.STORAGE_ACCOUNT }}
+        RESOURCE_GROUP: hisham-rg
+
       steps:
           - name: "Wait before Destroying"
             run: sleep 60 # Wait for a minute

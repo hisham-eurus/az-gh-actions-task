@@ -19,6 +19,8 @@ permissions:
 jobs:
   login:
     runs-on: ubuntu-latest
+    env:
+        RESOURCE_GROUP: hisham-rg
     outputs:
       subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     steps:
@@ -34,4 +36,4 @@ jobs:
         with:
           inlineScript: |
             az account show;
-            az resources list --resource-group hisham-rg
+            az resource list --resource-group $RESOURCE_GROUP --output table
