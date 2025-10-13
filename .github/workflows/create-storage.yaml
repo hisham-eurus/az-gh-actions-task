@@ -18,7 +18,7 @@ jobs:
       steps:
           - name: "Checkout Code"
             uses: actions/checkout@v4
-            
+
           - name: "Setup Terraform"
             uses: hashicorp/setup-terraform@v3
 
@@ -29,3 +29,5 @@ jobs:
             run: terraform apply -auto-approve 
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+              -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
+              -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
