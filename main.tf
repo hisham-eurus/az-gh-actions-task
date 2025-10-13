@@ -37,3 +37,4 @@ resource "azurerm_storage_account" "terraform_storage_acc" {
   account_replication_type = "LRS"
 }
 
+# TODO: Plan Terraform with GH Actions
