@@ -37,3 +37,12 @@ jobs:
           inlineScript: |
             az account show;
             az resource list --resource-group $RESOURCE_GROUP --output table
+
+      - name: Verify Terraform Remote Backend Storage Account
+        run: |
+          echo "Checking if Terraform state storage account exists..."
+          if az storage account show --name tfstatestorage131025 --resource-group hisham-rg --output table; then
+            echo "✅ Storage account found."
+          else
+            echo "❌ Storage account 'tfstatestorage131025' not found."
+          fi

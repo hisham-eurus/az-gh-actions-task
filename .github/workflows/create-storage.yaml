@@ -10,7 +10,7 @@ on:
             trigger_destroy:
                 description: "Trigger destroy workflow after creation (true/false)"
                 required: false
-                default: "false"
+                default: "true"   
 
 
 permissions:
@@ -28,6 +28,7 @@ jobs:
       needs: call-login
       runs-on: ubuntu-latest
       env:
+        ARM_USE_OIDC: true
         ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -43,31 +44,10 @@ jobs:
             uses: hashicorp/setup-terraform@v3
 
           - name: Terraform Init
-            run: terraform init
+            run: terraform init -reconfigure -upgrade
 
-          # - name: Check if Storage Account already Exists
-          #   id: check
-          #   run: |
-          #     echo "Checking if Storage Account $STORAGE_ACC_NAME exists"
-          #     if az storage account show -n $STORAGE_ACC_NAME -g $RESOURCE_GROUP >/dev/null 2>&1; then
-          #       echo "storage account already exists"
-          #       echo "STORAGE_EXISTS=true" >> $GITHUB_ENV
-          #     else
-          #       echo "storage account doesn't exist"
-          #       echo "STORAGE_EXISTS=false" >> $GITHUB_ENV
-          #     fi
-            
-          # - name: Import Existing Storage Account into Terraform State
-          #   if: env.STORAGE_EXISTS == 'true'
-          #   run: |
-          #     echo "Importing storage account into Terraform state"
-          #     terraform import azurerm_storage_account.terraform_storage_acc /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACC_NAME \
-          #     -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" \
-          #     -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-          #     -var "client_id=${{ secrets.AZURE_CLIENT_ID }}" \
-          #     -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
-          - name: Terraform Plan - Apply
-            if: ${{ github.event.inputs.plan_only == true }}
+          - name: Terraform Plan
+            if: ${{ github.event.inputs.plan_only == 'true' }}
             run: terraform plan
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
@@ -75,17 +55,28 @@ jobs:
               -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
 
           - name: Terraform Apply - Create Storage Acc
-            if: ${{ github.event.inputs.plan_only == false }}
+            if: ${{ github.event.inputs.plan_only == 'false' }}
             run: terraform apply -auto-approve 
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
               -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
               -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
 
-          - name: Trigger Destroy Workflow 
-            if: ${{ github.event.inputs.trigger_destroy == 'true' }}
-            env:
-              GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            run: |
-              echo "Triggering Destroy Workflow..."
-              gh workflow run "Destroy Azure Storage Account with Terraform" --ref main
+          - name: Save Terraform Plan Output
+            if: ${{ github.event.inputs.plan_only == 'true' }}
+            run: terraform show -no-color > plan_output.txt
+
+          - name: Upload Plan Artifact
+            if: ${{ github.event.inputs.plan_only == 'true' }}
+            uses: actions/upload-artifact@v4
+            with:
+              name: terraform-plan
+              path: plan_output.txt
+
+          # - name: Trigger Destroy Workflow 
+          #   if: ${{ github.event.inputs.trigger_destroy == 'true' }}
+          #   env:
+          #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          #   run: |
+          #     echo "Triggering Destroy Workflow..."
+          #     gh workflow run "Destroy Azure Storage Account with Terraform" --ref main

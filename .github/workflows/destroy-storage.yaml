@@ -6,9 +6,9 @@ on:
     #             description: "Skip the Terraform destroy step (true/false)"
     #             required: false
     #             default: "false"
-    # workflow_run:
-    #   workflows: ["Create Azure Storage Account with Terraform"]
-    #   types: completed
+    workflow_run:
+      workflows: ["Create Azure Storage Account with Terraform"]
+      types: completed
 
 permissions:
   id-token: write # Require write permission to Fetch an OIDC token.
@@ -26,6 +26,7 @@ jobs:
       environment: development
       runs-on: ubuntu-latest
       env:
+        ARM_USE_OIDC: true
         ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -46,25 +47,20 @@ jobs:
           - name: "Setup Terraform"
             uses: hashicorp/setup-terraform@v3
 
-          - name: Terraform Init
-            run: terraform init
+          - name: Terraform Init - Remote Backend
+            run: terraform init -reconfigure -upgrade
             
-          - name: Import Existing Storage Account into Terraform State
-            run: |
-              echo "Importing storage account into Terraform state"
-              terraform import -input=false azurerm_storage_account.terraform_storage_acc /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACC_NAME
+        #   - name: Import Existing Storage Account into Terraform State
+        #     run: |
+        #       echo "Importing storage account into Terraform state"
+        #       terraform import -input=false azurerm_storage_account.terraform_storage_acc /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACC_NAME
 
-          - name: Terraform Plan - Destroy
+          - name: Terraform Plan ( Destroy )
             run: terraform plan -destroy
-              -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
+              -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}"
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
               -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
               -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
-
-          - name: Wait for manual confirmation
-            run: |
-                echo "⚠️  Please confirm you really want to destroy the storage account."
-                echo "This workflow will pause for manual approval in the UI."
             
           - name: Terraform Destroy Storage Account
             run: terraform destroy -auto-approve 
