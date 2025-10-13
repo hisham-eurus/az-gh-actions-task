@@ -44,8 +44,10 @@ jobs:
             run: |
               echo "Checking if Storage Account $STORAGE_ACC_NAME exists"
               if az storage account show -n $STORAGE_ACC_NAME -g $RESOURCE_GROUP >/dev/null 2>&1; then
+                echo "storage account already exists"
                 echo "STORAGE_EXISTS=true" >> $GITHUB_ENV
               else
+                echo "storage account doesn't exist"
                 echo "STORAGE_EXISTS=false" >> $GITHUB_ENV
               fi
             
