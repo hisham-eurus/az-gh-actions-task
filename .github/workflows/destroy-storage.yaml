@@ -1,6 +1,11 @@
 name: Destroy Azure Storage Account with Terraform
 on:
-    workflow_dispatch: 
+    workflow_dispatch:
+        inputs:
+            skip_destroy:
+                description: "Skip the Terraform destroy step (true/false)"
+                required: false
+                default: "false"
     workflow_run:
       workflows: ["Create Azure Storage Account with Terraform"]
       types: completed
@@ -33,20 +38,6 @@ jobs:
       steps:
           - name: "Wait before Destroying"
             run: sleep 60 # Wait for a minute
-
-        #   - name: Azure CLI Login
-        #     uses: azure/login@v2
-        #     with:
-        #       client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        #       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        #       subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          
-        #   - name: Verify Login, List Resources
-        #     uses: azure/cli@v2
-        #     with:
-        #       inlineScript: |
-        #         az account show;
-        #         az resource list --resource-group $RESOURCE_GROUP --output table
     
           - name: "Checkout Code"
             uses: actions/checkout@v4
@@ -62,14 +53,16 @@ jobs:
               echo "Importing storage account into Terraform state"
               terraform import -input=false azurerm_storage_account.terraform_storage_acc /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACC_NAME
 
-        #   - name: Terraform Plan - Destroy
-        #     run: terraform plan -destroy
-        #       -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
-        #       -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-        #       -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
-        #       -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
+          - name: Terraform Plan - Destroy
+            if: ${{ github.event.inputs.skip_destroy == true }}
+            run: terraform plan -destroy
+              -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
+              -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+              -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
+              -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
             
           - name: Terraform Destroy Storage Account
+            if: ${{ github.event.inputs.skip_destroy == false }}
             run: terraform destroy -auto-approve 
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
