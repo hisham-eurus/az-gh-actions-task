@@ -21,7 +21,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
           - name: "Wait before Destroying"
-            run: sleep 240
+            run: sleep 60 # Wait for a minute
     
           - name: "Checkout Code"
             uses: actions/checkout@v4
@@ -31,6 +31,13 @@ jobs:
 
           - name: Terraform Init
             run: terraform init
+
+          - name: Terraform Plan
+            run: terraform plan
+              -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
+              -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+              -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
+              -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
             
           - name: Terraform Destroy Storage Account
             run: terraform destroy -auto-approve 
