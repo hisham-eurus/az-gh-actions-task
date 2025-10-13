@@ -34,21 +34,19 @@ jobs:
 
           - name: Check if Storage Account already Exists
             id: check
-            uses: azure/cli@v2
-            with:
-              inlineScript: |
-                echo "Checking if Storage Account $STORAGE_ACC_NAME exists"
-                if az storage account show -n $STORAGE_ACC_NAME -g $RESOURCE_GROUP >/dev/null 2>&1; then
-                  echo "exists=true" >> $GITHUB_OUTPUT
-                else
-                  echo "exists=false" >> $GITHUB_OUTPUT
-                fi
+            run: |
+              echo "Checking if Storage Account $STORAGE_ACC_NAME exists"
+              if az storage account show -n $STORAGE_ACC_NAME -g $RESOURCE_GROUP >/dev/null 2>&1; then
+                echo "exists=true" >> $GITHUB_OUTPUT
+              else
+                echo "exists=false" >> $GITHUB_OUTPUT
+              fi
             
           - name: Import Existing Storage Account into Terraform State
             if: steps.check.outputs.exists == 'true'
             run: |
               echo "Importing storage account into Terraform state"
-              terraform import azurerm_storage_account.githubactionsstorage /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACC_NAME
+              terraform import azurerm_storage_account.terraform_storage_acc /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACC_NAME
 
           - name: Terraform Apply - Create Storage Acc
             run: terraform apply -auto-approve 
