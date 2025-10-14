@@ -53,6 +53,16 @@ jobs:
           - name: Terraform State list
             run: terraform state list
 
+          - name: Create terraform.tfvars file dynamically
+            run: |
+              cat > terraform.tfvars <<EOF
+              storage_acc_name   = "${{ vars.STORAGE_ACCOUNT }}"
+              subscription_id    = "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+              tenant_id          = "${{ secrets.AZURE_TENANT_ID }}"
+              client_id          = "${{ secrets.AZURE_CLIENT_ID }}"
+              resource_group     = "hisham-rg"
+              EOF
+
           - name: Terraform Plan ( Destroy )
             run: terraform plan -destroy -out storageaccountdestroy.tfplan -var-file=terraform.tfvars
 
