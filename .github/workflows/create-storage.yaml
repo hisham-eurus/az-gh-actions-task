@@ -63,7 +63,7 @@ jobs:
               cat storageaccplan.md >> $GITHUB_STEP_SUMMARY
 
           - name: Terraform Apply - Create Storage Acc
-            if: ${{ github.event.inputs.plan_only == 'false' }}
+            # if: ${{ github.event.inputs.plan_only == 'false' }}
             run: terraform apply -auto-approve 
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"

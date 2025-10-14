@@ -38,8 +38,8 @@ jobs:
         TF_VAR_storage_acc_name: ${{ vars.STORAGE_ACCOUNT }}
 
       steps:
-          - name: "Wait before Destroying"
-            run: sleep 60 # Wait for a minute
+          # - name: "Wait before Destroying"
+          #   run: sleep 60 # Wait for a minute
     
           - name: "Checkout Code"
             uses: actions/checkout@v4
@@ -59,11 +59,17 @@ jobs:
         #       terraform import -input=false azurerm_storage_account.terraform_storage_acc /subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACC_NAME
 
           - name: Terraform Plan ( Destroy )
-            run: terraform plan -destroy
+            run: terraform plan -destroy -out storageaccountdestroy.tfplan
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}"
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
               -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
               -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
+
+          - name: Make Markdown Summary with terraform-j2md
+            id: plan-summary
+            run: | 
+              terraform show -json storageaccountdestroy.tfplan | utils/terraform-j2md > storageaccplan.md
+              cat storageaccplan.md >> $GITHUB_STEP_SUMMARY
             
           - name: Terraform Destroy Storage Account
             run: terraform destroy -auto-approve 
