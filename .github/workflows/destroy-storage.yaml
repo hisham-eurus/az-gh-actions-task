@@ -1,11 +1,6 @@
 name: Destroy Resources
 on:
     workflow_dispatch:
-    #     inputs:
-    #         skip_destroy:
-    #             description: "Skip the Terraform destroy step (true/false)"
-    #             required: false
-    #             default: "false"
     workflow_run:
       workflows: ["Provision Resources"]
       types: completed
@@ -38,9 +33,6 @@ jobs:
         TF_VAR_storage_acc_name: ${{ vars.STORAGE_ACCOUNT }}
 
       steps:
-          # - name: "Wait before Destroying"
-          #   run: sleep 60 # Wait for a minute
-    
           - name: "Checkout Code"
             uses: actions/checkout@v4
 

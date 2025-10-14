@@ -7,10 +7,6 @@ on:
                 description: "Only plan the Terraform Apply step (true/false)"
                 required: false
                 default: "false"
-            trigger_destroy:
-                description: "Trigger destroy workflow after creation (true/false)"
-                required: false
-                default: "true"   
 
 
 permissions:
@@ -69,13 +65,5 @@ jobs:
               cat storageaccplan.md >> $GITHUB_STEP_SUMMARY
 
           - name: Terraform Apply - Create Storage Account
-            # if: ${{ github.event.inputs.plan_only == 'false' }}
+            if: ${{ github.event.inputs.plan_only == 'false' }}
             run: terraform apply -auto-approve -var-file=terraform.tfvars
-
-          # - name: Trigger Destroy Workflow 
-          #   if: ${{ github.event.inputs.trigger_destroy == 'true' }}
-          #   env:
-          #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          #   run: |
-          #     echo "Triggering Destroy Workflow..."
-          #     gh workflow run "Destroy Azure Storage Account with Terraform" --ref main
