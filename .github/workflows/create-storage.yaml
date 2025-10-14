@@ -6,7 +6,7 @@ on:
             plan_only:
                 description: "Only plan the Terraform Apply step (true/false)"
                 required: false
-                default: "false"
+                default: 'false'
 
 
 permissions:
@@ -45,15 +45,13 @@ jobs:
           - name: Terraform State list
             run: terraform state list 
 
-          - name: Create terraform.tfvars file dynamically
+          - name: Update terraform.tfvars file with actual values
             run: |
-              cat > terraform.tfvars <<EOF
-              storage_acc_name   = "${{ vars.STORAGE_ACCOUNT }}"
-              subscription_id    = "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-              tenant_id          = "${{ secrets.AZURE_TENANT_ID }}"
-              client_id          = "${{ secrets.AZURE_CLIENT_ID }}"
-              resource_group     = "hisham-rg"
-              EOF
+              sed -i "s|__STORAGE_ACCOUNT__|$STORAGE_ACC_NAME|g" terraform.tfvars
+              sed -i "s|__SUBSCRIPTION_ID__|$ARM_SUBSCRIPTION_ID|g" terraform.tfvars
+              sed -i "s|__TENANT_ID__|$ARM_TENANT_ID|g" terraform.tfvars
+              sed -i "s|__CLIENT_ID__|$ARM_CLIENT_ID|g" terraform.tfvars
+              sed -i "s|__RESOURCE_GROUP__|$RESOURCE_GROUP|g" terraform.tfvars
 
           - name: Terraform Plan
             run: terraform plan -out storageaccount.tfplan -var-file=terraform.tfvars

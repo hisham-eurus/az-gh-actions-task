@@ -24,7 +24,7 @@ variable "tenant_id" {
 }
 
 variable "resource_group" {
-    type = string
-    description = "Name for resource group"
-    default = "hisham-rg"
+  type        = string
+  description = "Name for resource group"
+  default     = "hisham-rg"
 }

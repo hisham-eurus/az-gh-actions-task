@@ -1,0 +1,5 @@
+storage_acc_name = "__STORAGE_ACCOUNT__" # "placeholderstorage0000"
+resource_group   = "__RESOURCE_GROUP__"  # "placeholder-rg"
+client_id        = "__CLIENT_ID__"       # "00000000-0000-0000-0000-000000000000"
+subscription_id  = "__SUBSCRIPTION_ID__" # "00000000-0000-0000-0000-000000000000"
+tenant_id        = "__TENANT_ID__"       # "00000000-0000-0000-0000-000000000000"
