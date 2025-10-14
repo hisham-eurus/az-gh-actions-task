@@ -46,6 +46,9 @@ jobs:
           - name: Terraform Init
             run: terraform init -reconfigure -upgrade
 
+          - name: Terraform State list
+            run: terraform state list 
+
           - name: Terraform Plan
             run: terraform plan -out storageaccout.tfplan
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 

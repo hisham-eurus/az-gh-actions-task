@@ -46,5 +46,4 @@ jobs:
           else
             echo "❌ Storage account 'tfstatestorage131025' not found."
           fi
-      - name: Terraform State list
-        run: terraform state list 
+
