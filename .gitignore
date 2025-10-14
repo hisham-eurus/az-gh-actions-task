@@ -2,4 +2,5 @@
 *.tfplan
 *.lock.hcl
 *.tfstate*
+*.tfvars
 *.md

@@ -1,51 +1,6 @@
-# Variables
 
-variable "storage_acc_name" {
-  type        = string
-  description = "The unique name of the storage account"
-}
 
-variable "subscription_id" {
-  type        = string
-  sensitive   = true
-  description = "Subscription ID for Terraform to Authenticate with Azure"
-}
 
-variable "client_id" {
-  type        = string
-  sensitive   = true
-  description = "Client ID for Terraform to Authenticate with Azure"
-}
-
-variable "tenant_id" {
-  type        = string
-  sensitive   = true
-  description = "Tenant ID for Terraform to Authenticate with Azure"
-}
-
-terraform {
-  backend "azurerm" {
-    resource_group_name  = "hisham-rg"
-    storage_account_name = "tfstatestorage131025"
-    container_name       = "tfstate"
-    key                  = "terraform.tfstate"
-    use_azuread_auth     = true
-  }
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">4.4.0"
-    }
-  }
-}
-
-# Configure the Microsoft Azure Provider
-provider "azurerm" {
-  features {}
-  # In version 4 of azurerm, subscription id is mandatory.
-  # export ARM_SUBSCRIPTION_ID=00000000-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-
-}
 
 resource "azurerm_storage_account" "terraform_storage_acc" {
   name                     = var.storage_acc_name
