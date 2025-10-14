@@ -48,11 +48,17 @@ jobs:
 
           - name: Terraform Plan
             if: ${{ github.event.inputs.plan_only == 'true' }}
-            run: terraform plan
+            run: terraform plan -out storageaccout.tfplan
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
               -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
               -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
+
+          - name: Make Markdown Summary with terraform-j2md
+            id: plan-summary
+            run: | 
+              terraform show -json storageaccount.tfplan | utils/terraform-j2md > storageaccplan.md
+              cat storageaccplan.md >> $GITHUB_STEP_SUMMARY
 
           - name: Terraform Apply - Create Storage Acc
             if: ${{ github.event.inputs.plan_only == 'false' }}
@@ -62,16 +68,6 @@ jobs:
               -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
               -var "tenant_id=${{ secrets.AZURE_TENANT_ID }}"
 
-          - name: Save Terraform Plan Output
-            if: ${{ github.event.inputs.plan_only == 'true' }}
-            run: terraform show -no-color > plan_output.txt
-
-          - name: Upload Plan Artifact
-            if: ${{ github.event.inputs.plan_only == 'true' }}
-            uses: actions/upload-artifact@v4
-            with:
-              name: terraform-plan
-              path: plan_output.txt
 
           # - name: Trigger Destroy Workflow 
           #   if: ${{ github.event.inputs.trigger_destroy == 'true' }}

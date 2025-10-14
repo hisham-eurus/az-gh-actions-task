@@ -44,10 +44,6 @@ provider "azurerm" {
   features {}
   # In version 4 of azurerm, subscription id is mandatory.
   # export ARM_SUBSCRIPTION_ID=00000000-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-  use_oidc        = true
-  client_id       = var.client_id
-  tenant_id       = var.tenant_id
-  subscription_id = var.subscription_id
 
 }
 
