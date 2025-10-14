@@ -50,7 +50,7 @@ jobs:
             run: terraform state list 
 
           - name: Terraform Plan
-            run: terraform plan -out storageaccout.tfplan
+            run: terraform plan -out storageaccount.tfplan
               -var "storage_acc_name=${{ vars.STORAGE_ACCOUNT }}" 
               -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
               -var "client_id=${{ secrets.AZURE_CLIENT_ID }}"
