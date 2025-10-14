@@ -49,9 +49,6 @@ jobs:
 
           - name: Terraform Init - Remote Backend
             run: terraform init -reconfigure -upgrade
-
-          - name: Terraform State list
-            run: terraform state list 
             
         #   - name: Import Existing Storage Account into Terraform State
         #     run: |
