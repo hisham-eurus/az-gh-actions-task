@@ -5,6 +5,10 @@ on:
       workflows: ["Provision Resources"]
       types: completed
 
+concurrency: 
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   id-token: write # Require write permission to Fetch an OIDC token.
   contents: read

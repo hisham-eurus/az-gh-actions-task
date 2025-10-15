@@ -8,6 +8,10 @@ on:
                 required: false
                 default: 'false'
 
+concurrency: 
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   id-token: write # Require write permission to Fetch an OIDC token.
   contents: read
@@ -28,7 +32,7 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         STORAGE_ACC_NAME: ${{ vars.STORAGE_ACCOUNT }}
-        
+
       steps:
 
           - name: "Checkout Code"
