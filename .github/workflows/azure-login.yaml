@@ -12,9 +12,9 @@ on:
       AZURE_SUBSCRIPTION_ID:
         required: true
 
-concurrency: 
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+# concurrency: 
+#   group: ci-${{ github.ref }}
+#   cancel-in-progress: true
 
 permissions:
   id-token: write
