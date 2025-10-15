@@ -23,7 +23,7 @@ jobs:
     destroy-resources:
       needs: call-login
       environment: development
-      runs-on: ubuntu-latest
+      runs-on: self-hosted # ubuntu-latest
       env:
         ARM_USE_OIDC: true
         ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
