@@ -1,7 +1,4 @@
 
-
-
-
 resource "azurerm_storage_account" "terraform_storage_acc" {
   name                     = var.storage_acc_name
   resource_group_name      = "hisham-rg"

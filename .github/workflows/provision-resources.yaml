@@ -19,7 +19,7 @@ jobs:
         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
-    create-storage:
+    provision-resources:
       needs: call-login
       runs-on: ubuntu-latest
       env:
