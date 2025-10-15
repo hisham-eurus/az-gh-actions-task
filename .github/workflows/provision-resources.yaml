@@ -28,8 +28,7 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         STORAGE_ACC_NAME: ${{ vars.STORAGE_ACCOUNT }}
-        RESOURCE_GROUP: hisham-rg
-
+        
       steps:
 
           - name: "Checkout Code"
@@ -46,11 +45,9 @@ jobs:
 
           - name: Update terraform.tfvars file with actual values
             run: |
-              sed -i "s|__STORAGE_ACCOUNT__|$STORAGE_ACC_NAME|g" terraform.tfvars
               sed -i "s|__SUBSCRIPTION_ID__|$ARM_SUBSCRIPTION_ID|g" terraform.tfvars
               sed -i "s|__TENANT_ID__|$ARM_TENANT_ID|g" terraform.tfvars
               sed -i "s|__CLIENT_ID__|$ARM_CLIENT_ID|g" terraform.tfvars
-              sed -i "s|__RESOURCE_GROUP__|$RESOURCE_GROUP|g" terraform.tfvars
 
           - name: Terraform Plan
             run: terraform plan -out storageaccount.tfplan -var-file=terraform.tfvars
